@@ -24,3 +24,4 @@ cdk deploy Pardus-Security-dev
 curl http://<ALB-DNS>/health# Additional configs
 ## ECS updates
 CDN setup
+# Testing
