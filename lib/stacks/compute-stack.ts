@@ -222,12 +222,26 @@ export class ComputeStack extends cdk.Stack {
     // Attach service to target group
     this.service.attachToApplicationTargetGroup(targetGroup);
 
-    // HTTP Listener
+    // HTTP Listener - redirect to HTTPS in production
     const httpListener = this.loadBalancer.addListener('HttpListener', {
       port: 80,
       protocol: elbv2.ApplicationProtocol.HTTP,
-      defaultAction: elbv2.ListenerAction.forward([targetGroup]),
+      defaultAction: config.env === 'prod' 
+        ? elbv2.ListenerAction.redirect({
+            port: '443',
+            protocol: elbv2.ApplicationProtocol.HTTPS,
+            permanent: true,
+          })
+        : elbv2.ListenerAction.forward([targetGroup]),
     });
+    
+    // Note: For production, you would add an HTTPS listener with ACM certificate
+    // const httpsListener = this.loadBalancer.addListener('HttpsListener', {
+    //   port: 443,
+    //   protocol: elbv2.ApplicationProtocol.HTTPS,
+    //   certificates: [certificate],
+    //   defaultAction: elbv2.ListenerAction.forward([targetGroup]),
+    // });
 
     // Auto Scaling
     const scaling = this.service.autoScaleTaskCount({
