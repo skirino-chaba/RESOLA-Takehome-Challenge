@@ -1,24 +1,58 @@
-# Pardus — LiteLLM on AWS (Production-lean)
+# LiteLLM AWS Infrastructure
 
-**Goal (3–5 days)**: Deploy LiteLLM proxy on AWS with IaC, basic DevOps, and essential security/monitoring.
+Production-ready deployment of LiteLLM proxy on AWS using CDK.
 
-## Architecture (shipped)
-- VPC (2 AZ), public+private subnets, NAT
-- ALB (+ WAF basic rules) → ECS Fargate (LiteLLM)
-- RDS PostgreSQL (single-AZ), ElastiCache Redis (1 node)
-- S3 (versioned), CloudWatch logs/metrics/alarms
-- Secrets Manager + Parameter Store
+## Architecture
 
-## Why this scope
-The prompt calls for RDS + Redis + WAF + ALB + ECS. I kept each to a minimal, explainable configuration and documented what I’d add next rather than shipping a full platform.
+- **Network**: Multi-AZ VPC with public, private, and isolated subnets
+- **Compute**: ECS Fargate running LiteLLM behind Application Load Balancer
+- **Data**: RDS PostgreSQL (Multi-AZ in prod) and ElastiCache Redis
+- **Edge**: CloudFront CDN with WAF protection
+- **Monitoring**: CloudWatch dashboards and alarms
 
-## How to deploy
+## Prerequisites
+
+- AWS Account with appropriate permissions
+- Node.js 18+ and npm
+- AWS CLI configured
+- CDK CLI (`npm install -g aws-cdk`)
+
+## Deployment
+
 ```bash
-npm i
-cdk bootstrap aws://<account>/<region>
-cdk deploy Pardus-Network-dev
-cdk deploy Pardus-Data-dev
-cdk deploy Pardus-Compute-dev
-cdk deploy Pardus-Security-dev
+# Install dependencies
+npm install
 
-curl http://<ALB-DNS>/health
+# Bootstrap CDK (first time only)
+cdk bootstrap
+
+# Deploy all stacks
+cdk deploy --all --context env=dev
+
+# Or deploy individually
+cdk deploy LiteLLM-Network-dev
+cdk deploy LiteLLM-Data-dev
+cdk deploy LiteLLM-Compute-dev
+cdk deploy LiteLLM-Monitoring-dev
+cdk deploy LiteLLM-Edge-dev
+```
+
+## Environments
+
+- **dev**: Development environment with minimal resources
+- **prod**: Production environment with HA and scaling
+
+## CI/CD
+
+GitHub Actions workflow automatically deploys to dev on push to main.
+Production deployments require manual trigger.
+
+## Access Points
+
+After deployment, the application is accessible at:
+- ALB: `http://<load-balancer-dns>/`
+- CloudFront: `https://<distribution-id>.cloudfront.net/`
+
+## Configuration
+
+Environment-specific configs are in `config/dev.json` and `config/prod.json`.
