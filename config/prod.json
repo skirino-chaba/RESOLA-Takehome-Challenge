@@ -1,0 +1,29 @@
+{
+  "env": "prod",
+  "region": "us-east-1",
+  "vpc": {
+    "maxAzs": 2,
+    "natGateways": 2
+  },
+  "rds": {
+    "instanceClass": "t3",
+    "instanceSize": "medium",
+    "allocatedStorage": 100,
+    "backupRetention": 7,
+    "multiAz": true
+  },
+  "redis": {
+    "nodeType": "cache.t3.small",
+    "numNodes": 1
+  },
+  "ecs": {
+    "cpu": 1024,
+    "memory": 2048,
+    "desiredCount": 2,
+    "maxCount": 6
+  },
+  "cloudfront": {
+    "enabled": true,
+    "priceClass": "PriceClass_100"
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "env": "dev",
+  "region": "us-east-1",
+  "vpc": {
+    "maxAzs": 2,
+    "natGateways": 1
+  },
+  "rds": {
+    "instanceClass": "t3",
+    "instanceSize": "small",
+    "allocatedStorage": 20,
+    "backupRetention": 3
+  },
+  "redis": {
+    "nodeType": "cache.t3.micro",
+    "numNodes": 1
+  },
+  "ecs": {
+    "cpu": 512,
+    "memory": 1024,
+    "desiredCount": 1,
+    "maxCount": 3
+  },
+  "cloudfront": {
+    "enabled": true
+  }
+}
